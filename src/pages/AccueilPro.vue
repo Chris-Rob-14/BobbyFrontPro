@@ -99,32 +99,8 @@
               <div
                 class="self-stretch flex flex-row items-start justify-start max-w-full"
               >
-                <div
-                  class="w-[467px] rounded-181xl bg-ivoire overflow-hidden shrink-0 flex flex-col items-center justify-start pt-[53px] pb-[54px] pr-[42px] pl-[31px] box-border gap-[17px] max-w-full mq925:pr-[21px] mq925:box-border"
-                >
-                  <div
-                    class="w-[467px] h-[215px] relative rounded-181xl bg-ivoire hidden max-w-full"
-                  />
-                  <div
-                    class="self-stretch h-[34px] relative font-semibold inline-block shrink-0 z-[1] mq450:text-xl"
-                  >
-                    Trouver vos clients en un clic
-                  </div>
-                  <div
-                    class="w-[298px] rounded-[77.15px] bg-orange overflow-hidden flex flex-row items-center justify-start py-[15px] px-[50px] box-border cursor-pointer z-[1] text-left text-3xl text-ivoire mq450:pl-5 mq450:pr-5 mq450:box-border"
-                    @click="onAddClientButtonClick"
-                  >
-                    <div
-                      class="h-[57.9px] w-[298px] relative rounded-[77.15px] bg-orange hidden"
-                    />
-                    <div
-                      class="h-[27px] relative font-semibold inline-block z-[1] mq450:text-lg"
-                    >
-                      RECHERCHER
-                    </div>
-                  </div>
-                </div>
               </div>
+              
               <div
                 class="w-[366px] rounded-181xl bg-lavender flex flex-col items-center justify-start pt-4 pb-[17px] pr-[67px] pl-[65px] box-border gap-[18px] max-w-full mq450:pl-5 mq450:pr-5 mq450:box-border"
               >
@@ -148,7 +124,7 @@
                 </div>
               </div>
             </div>
-            <div
+            <!-- <div
               class="w-[590px] rounded-181xl bg-ivoire overflow-hidden flex flex-col items-center justify-start pt-[53px] px-[53px] pb-[54px] box-border gap-[17px] max-w-full mq925:pl-[26px] mq925:pr-[26px] mq925:box-border"
             >
               <div
@@ -173,7 +149,7 @@
                  
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
         <ButtonAdd />
