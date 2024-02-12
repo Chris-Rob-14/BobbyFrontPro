@@ -301,5 +301,8 @@
 
   export default defineComponent({
     name: "ButtonAdd",
+    onMounted() {
+      console.log('mounted');
+    }
   });
 </script>

@@ -124,6 +124,12 @@
                 </div>
               </div>
             </div>
+            <div v-for="rdv in rdvs">
+              <p>{{ rdv.subject }} </p>
+              <p>{{ formatDate(rdv.date_start)}} </p>
+              <p>{{ rdv.animalId }} </p>
+            </div>
+              
             <!-- <div
               class="w-[590px] rounded-181xl bg-ivoire overflow-hidden flex flex-col items-center justify-start pt-[53px] px-[53px] pb-[54px] box-border gap-[17px] max-w-full mq925:pl-[26px] mq925:pr-[26px] mq925:box-border"
             >
@@ -152,7 +158,6 @@
             </div> -->
           </div>
         </div>
-        <ButtonAdd />
       </section>
     </main>
   </div>
@@ -160,6 +165,7 @@
 <script lang="ts">
   import { defineComponent } from "vue";
   import ButtonAdd from "../components/ButtonAdd.vue";
+  import RdvHomePage from "../components/RdvHomePage.vue";
   import axios from 'axios';
 
   export default defineComponent({
@@ -170,24 +176,31 @@
         veto: {
           type: Object,
         },
-        rdv: {
-          type: Object,
-                  },
+        rdvs: [],
         logo: "" as string,
       };
     },
     async beforeMount() {
         await this.getVetoStatus();
-        console.log(this.veto.veterinary.id);
 
         await this.getVetoRdvs();
-        console.log(this.rdvs);
 
     },
     async created() {
       this.logo = this.$route.meta.logo as string;
     },
     methods: {
+      formatDate(dateString) {
+            const options = {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false // Pour afficher l'heure en format 24 heures
+            };
+            return new Date(dateString).toLocaleString('fr-FR', options);
+        },
       async getVetoStatus()
       {
         const response = await axios.get('http://localhost:3030/auth/status', {
@@ -215,6 +228,8 @@
             const response = await axios.get(url, {
               withCredentials: true,
             });
+
+            console.log(response.data)
 
             this.rdvs = response.data;
         } catch(error) {
