@@ -160,19 +160,67 @@
 <script lang="ts">
   import { defineComponent } from "vue";
   import ButtonAdd from "../components/ButtonAdd.vue";
+  import axios from 'axios';
 
   export default defineComponent({
     name: "AccueilPro",
     components: { ButtonAdd },
     data() {
       return {
+        veto: {
+          type: Object,
+        },
+        rdv: {
+          type: Object,
+                  },
         logo: "" as string,
       };
     },
-    created() {
+    async beforeMount() {
+        await this.getVetoStatus();
+        console.log(this.veto.veterinary.id);
+
+        await this.getVetoRdvs();
+        console.log(this.rdvs);
+
+    },
+    async created() {
       this.logo = this.$route.meta.logo as string;
     },
     methods: {
+      async getVetoStatus()
+      {
+        const response = await axios.get('http://localhost:3030/auth/status', {
+          withCredentials: true,
+        })
+
+        this.veto = response.data;
+        this.vetoId = response.data.veterinary.id
+      },
+      async getVetoRdvs()
+      {
+        // Assuming your date object is stored in a variable called 'date'
+        const date = new Date();
+
+        // Get the year, month, and day from the date object
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so we add 1
+        const day = String(date.getDate()).padStart(2, '0');
+
+        // Concatenate the parts to form the desired format
+        const formattedDate = `${year}-${month}-${day}`;
+
+        const url = 'http://localhost:3030/veterinaries/rdv/' + this.vetoId + '/' + formattedDate;
+        try {
+            const response = await axios.get(url, {
+              withCredentials: true,
+            });
+
+            this.rdvs = response.data;
+        } catch(error) {
+          console.log(error);
+        }
+      },
       onGroupFClick() {
         this.$router.push("/recherchepro");
       },
@@ -189,8 +237,8 @@
         this.$router.push("/validationrdvpro");
       },
       onAccesButtonClick() {
-    this.$router.push("/comptePro");
-  },
+        this.$router.push("/comptePro");
+      },
     },
   });
 </script>
