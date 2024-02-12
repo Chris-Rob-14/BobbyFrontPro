@@ -99,32 +99,8 @@
               <div
                 class="self-stretch flex flex-row items-start justify-start max-w-full"
               >
-                <div
-                  class="w-[467px] rounded-181xl bg-ivoire overflow-hidden shrink-0 flex flex-col items-center justify-start pt-[53px] pb-[54px] pr-[42px] pl-[31px] box-border gap-[17px] max-w-full mq925:pr-[21px] mq925:box-border"
-                >
-                  <div
-                    class="w-[467px] h-[215px] relative rounded-181xl bg-ivoire hidden max-w-full"
-                  />
-                  <div
-                    class="self-stretch h-[34px] relative font-semibold inline-block shrink-0 z-[1] mq450:text-xl"
-                  >
-                    Trouver vos clients en un clic
-                  </div>
-                  <div
-                    class="w-[298px] rounded-[77.15px] bg-orange overflow-hidden flex flex-row items-center justify-start py-[15px] px-[50px] box-border cursor-pointer z-[1] text-left text-3xl text-ivoire mq450:pl-5 mq450:pr-5 mq450:box-border"
-                    @click="onAddClientButtonClick"
-                  >
-                    <div
-                      class="h-[57.9px] w-[298px] relative rounded-[77.15px] bg-orange hidden"
-                    />
-                    <div
-                      class="h-[27px] relative font-semibold inline-block z-[1] mq450:text-lg"
-                    >
-                      RECHERCHER
-                    </div>
-                  </div>
-                </div>
               </div>
+              
               <div
                 class="w-[366px] rounded-181xl bg-lavender flex flex-col items-center justify-start pt-4 pb-[17px] pr-[67px] pl-[65px] box-border gap-[18px] max-w-full mq450:pl-5 mq450:pr-5 mq450:box-border"
               >
@@ -148,7 +124,13 @@
                 </div>
               </div>
             </div>
-            <div
+            <div v-for="rdv in rdvs">
+              <p>{{ rdv.subject }} </p>
+              <p>{{ formatDate(rdv.date_start)}} </p>
+              <p>{{ rdv.animalId }} </p>
+            </div>
+              
+            <!-- <div
               class="w-[590px] rounded-181xl bg-ivoire overflow-hidden flex flex-col items-center justify-start pt-[53px] px-[53px] pb-[54px] box-border gap-[17px] max-w-full mq925:pl-[26px] mq925:pr-[26px] mq925:box-border"
             >
               <div
@@ -173,10 +155,9 @@
                  
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
-        <ButtonAdd />
       </section>
     </main>
   </div>
@@ -184,19 +165,77 @@
 <script lang="ts">
   import { defineComponent } from "vue";
   import ButtonAdd from "../components/ButtonAdd.vue";
+  import RdvHomePage from "../components/RdvHomePage.vue";
+  import axios from 'axios';
 
   export default defineComponent({
     name: "AccueilPro",
     components: { ButtonAdd },
     data() {
       return {
+        veto: {
+          type: Object,
+        },
+        rdvs: [],
         logo: "" as string,
       };
     },
-    created() {
+    async beforeMount() {
+        await this.getVetoStatus();
+
+        await this.getVetoRdvs();
+
+    },
+    async created() {
       this.logo = this.$route.meta.logo as string;
     },
     methods: {
+      formatDate(dateString) {
+            const options = {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false // Pour afficher l'heure en format 24 heures
+            };
+            return new Date(dateString).toLocaleString('fr-FR', options);
+        },
+      async getVetoStatus()
+      {
+        const response = await axios.get('http://localhost:3030/auth/status', {
+          withCredentials: true,
+        })
+
+        this.veto = response.data;
+        this.vetoId = response.data.veterinary.id
+      },
+      async getVetoRdvs()
+      {
+        // Assuming your date object is stored in a variable called 'date'
+        const date = new Date();
+
+        // Get the year, month, and day from the date object
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed, so we add 1
+        const day = String(date.getDate()).padStart(2, '0');
+
+        // Concatenate the parts to form the desired format
+        const formattedDate = `${year}-${month}-${day}`;
+
+        const url = 'http://localhost:3030/veterinaries/rdv/' + this.vetoId + '/' + formattedDate;
+        try {
+            const response = await axios.get(url, {
+              withCredentials: true,
+            });
+
+            console.log(response.data)
+
+            this.rdvs = response.data;
+        } catch(error) {
+          console.log(error);
+        }
+      },
       onGroupFClick() {
         this.$router.push("/recherchepro");
       },
@@ -213,8 +252,8 @@
         this.$router.push("/validationrdvpro");
       },
       onAccesButtonClick() {
-    this.$router.push("/comptePro");
-  },
+        this.$router.push("/comptePro");
+      },
     },
   });
 </script>

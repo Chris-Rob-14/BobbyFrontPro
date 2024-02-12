@@ -26,57 +26,65 @@
     >
       <div class="flex flex-col items-start justify-start gap-[8px] max-w-full w-[570px]">
         <label for="cabinetName" class="text-2xl font-semibold font-montserrat text-orange mq450:text-xl">Nom du cabinet vétérinaire</label>
-        <input id="cabinetName" v-model="cabinetName" type="text" class="h-[52px] w-full rounded-[10px] bg-white border-[1px] border-solid border-darkslateblue-100 flex flex-row items-center justify-start p-[15px] outline-none box-border">
+        <input id="cabinetName" v-model="name" type="text" class="h-[52px] w-full rounded-[10px] bg-white border-[1px] border-solid border-darkslateblue-100 flex flex-row items-center justify-start p-[15px] outline-none box-border">
       </div>
       <div class="flex flex-col items-start justify-start gap-[8px] max-w-full w-[570px]">
         <label for="postalAddress" class="text-2xl font-semibold font-montserrat text-orange mq450:text-xl">Adresse postale</label>
-        <input id="postalAddress" v-model="postalAddress" type="text" class="h-[52px] w-full rounded-[10px] bg-white border-[1px] border-solid border-darkslateblue-100 flex flex-row items-center justify-start p-[15px] outline-none box-border">
+        <input id="postalAddress" v-model="address" type="text" class="h-[52px] w-full rounded-[10px] bg-white border-[1px] border-solid border-darkslateblue-100 flex flex-row items-center justify-start p-[15px] outline-none box-border">
       </div>
       <div class="flex flex-col items-start justify-start gap-[8px] max-w-full w-[570px]">
         <label for="phoneNumber" class="text-2xl font-semibold font-montserrat text-orange mq450:text-xl">Numéro de téléphone</label>
-        <input id="phoneNumber" v-model="phoneNumber" type="tel" class="h-[52px] w-full rounded-[10px] bg-white border-[1px] border-solid border-darkslateblue-100 flex flex-row items-center justify-start p-[15px] outline-none box-border">
+        <input id="phoneNumber" v-model="number" type="tel" class="h-[52px] w-full rounded-[10px] bg-white border-[1px] border-solid border-darkslateblue-100 flex flex-row items-center justify-start p-[15px] outline-none box-border">
       </div>
       <div class="flex flex-col items-start justify-start gap-[8px] max-w-full w-[570px]">
         <label for="emailAddress" class="text-2xl font-semibold font-montserrat text-orange mq450:text-xl">Adresse mail</label>
-        <input id="emailAddress" v-model="emailAddress" type="email" class="h-[52px] w-full rounded-[10px] bg-white border-[1px] border-solid border-darkslateblue-100 flex flex-row items-center justify-start p-[15px] outline-none box-border">
+        <input id="emailAddress" v-model="email" type="email" class="h-[52px] w-full rounded-[10px] bg-white border-[1px] border-solid border-darkslateblue-100 flex flex-row items-center justify-start p-[15px] outline-none box-border">
       </div>
+      <br>
     </div>
-
-    <button type="submit" class="rounded-[77.15px] bg-orange flex flex-row items-center justify-center pt-4 pb-3.5 pr-[27px] pl-[23px] z-[1]">
-      <div class="h-[57.9px] w-[174px] relative rounded-[77.15px] bg-orange hidden"></div>
-      <div class="relative text-3xl font-semibold font-montserrat text-ivoire text-left z-[2] mq450:text-lg">
-        Enregistrer
-      </div>
-    </button>
-
   </form>
 </template>
 <script lang="ts">
  import { defineComponent, ref } from "vue";
+ import axios from 'axios';
+ axios.defaults.withCredentials = true;
 
 export default defineComponent({
-  name: "CabinetNameFrame",
-  setup() {
-    const cabinetName = ref("");
-    const postalAddress = ref("");
-    const phoneNumber = ref("");
-    const emailAddress = ref("");
-
-    const submitForm = () => {
-      // Envoyer les données du formulaire ici
-      console.log("Cabinet name:", cabinetName.value);
-      console.log("Postal address:", postalAddress.value);
-      console.log("Phone number:", phoneNumber.value);
-      console.log("Email address:", emailAddress.value);
-    };
-
+  data() {
     return {
-      cabinetName,
-      postalAddress,
-      phoneNumber,
-      emailAddress,
-      submitForm,
-    };
+      name: '',
+      address: '',
+      number: '',
+      email: '',
+    }
   },
+  async beforeMount() {
+    await this.getVeto();
+    console.log(this.name);
+  },
+  name: "CabinetNameFrame",
+  methods: {
+    async getVeto() {
+      try {
+          const response = await axios.get('http://localhost:3030/auth/status', {
+            withCredentials: true,
+          })
+
+          let veto = response.data.veterinary;
+
+          if (response.status === 200) {
+            console.log('ok');
+            this.name = veto.name;
+            this.address = veto.address + ' ' + veto.zip_code + ' ' + veto.city;
+            this.email = response.data.email
+          }
+
+        } catch (error) {
+
+          if (error.code == 'ERR_BAD_REQUEST') this.errorLogin = true;
+        }
+
+    }
+  }
 });
 </script>

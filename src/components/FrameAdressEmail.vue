@@ -1,5 +1,6 @@
 <template>
   <form
+    @submit.prevent="login"
     class="m-0 flex-1 flex flex-col items-start justify-start gap-[63px] mq450:gap-[63px]"
   >
     <div
@@ -14,6 +15,7 @@
           Adresse e-mail
         </div>
         <input
+          v-model="email"
           class="self-stretch rounded-smi bg-ivoire outline-none border-none flex flex-row items-center justify-start pt-3.5 px-[18px] pb-[9px] z-[2]"
           type="email"
           placeholder="Adresse e-mail"
@@ -28,6 +30,7 @@
           Mot de passe
         </div>
         <input
+        v-model="password"
           class="self-stretch rounded-smi bg-ivoire outline-none border-none flex flex-row items-center justify-between pt-3.5 px-[18px] pb-[15px] gap-[20px] z-[2]"
           type="password"
           placeholder="Mot de passe"
@@ -41,9 +44,10 @@
       <div class="h-[53px] w-[307px] relative rounded-11xl bg-orange hidden" />
       <div
         class="relative text-lgi font-montserrat font-semibold text-white text-center cursor-pointer z-[1]"
-        @click="onConnexionTextClick"
       >
-        Connexion
+        <button type="submit">
+          Connexion
+        </button>
       </div>
     </div>
     <div
@@ -56,10 +60,39 @@
 </template>
 <script lang="ts">
   import { defineComponent } from "vue";
+  import axios from 'axios';
+  axios.defaults.withCredentials = true;
 
   export default defineComponent({
+    data() {
+      return {
+        email: '',
+        password: '',
+        errorLogin: '',
+      }
+    },
     name: "FrameAdressEmail",
     methods: {
+      async login() {
+        try {
+          const response = await axios.post('http://localhost:3030/auth/login', {
+            email: this.email,
+            password: this.password
+          }, {
+            withCredentials: true,
+          })
+
+          console.log(response);
+
+          if (response.status === 201) {
+            this.$router.push("/accueilpro");
+          }
+
+        } catch (error) {
+
+          if (error.code == 'ERR_BAD_REQUEST') this.errorLogin = true;
+        }
+      },
       onConnexionTextClick() {
         this.$router.push("/accueilpro");
       },
